@@ -5,9 +5,9 @@ author: Gabriel LOPEZ
 title: (DataExpert.io) Bootcamp - Day 1 - Lecture 
 ---
 
-> Today lecture with deal with **complex data types** and **cumulation**
+Today lecture will deal with **complex data types** and **cumulation**
 
-### What is a dimension ?
+## What is a dimension ?
 
 Dimensions are the attributes of an entity
 

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html><head lang="en"><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>(DataExpert.io) Bootcamp - Day 2 - Lecture - Gabriel Study Blog</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Today&rsquo;s lecture deals with Slowly Changing Dimensions and Idempotency.
+
+Slowly changing dimensions = An attribute that drifts over time
+
+Example: Your favorite food
+Idempotency
+You need to model slowly dimensions the right way because they impact idempotency.
+
+Idempotent = Denoting an element of a set which is unchanged in value when multiplied or otherwise operated on by itself.
+
+
+Idempotent pipeline = The ability for your data pipeline to produce the same results whether it&rsquo;s running in production or in backfill." />
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content="http://localhost:1313/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day2/lecture/">
+  <meta property="og:site_name" content="Gabriel Study Blog">
+  <meta property="og:title" content="(DataExpert.io) Bootcamp - Day 2 - Lecture">
+  <meta property="og:description" content="Today’s lecture deals with Slowly Changing Dimensions and Idempotency.
+Slowly changing dimensions = An attribute that drifts over time
+Example: Your favorite food
+Idempotency You need to model slowly dimensions the right way because they impact idempotency.
+Idempotent = Denoting an element of a set which is unchanged in value when multiplied or otherwise operated on by itself.
+Idempotent pipeline = The ability for your data pipeline to produce the same results whether it’s running in production or in backfill.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-11-17T19:21:32+01:00">
+    <meta property="article:modified_time" content="2024-11-17T19:21:32+01:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="(DataExpert.io) Bootcamp - Day 2 - Lecture">
+  <meta name="twitter:description" content="Today’s lecture deals with Slowly Changing Dimensions and Idempotency.
+Slowly changing dimensions = An attribute that drifts over time
+Example: Your favorite food
+Idempotency You need to model slowly dimensions the right way because they impact idempotency.
+Idempotent = Denoting an element of a set which is unchanged in value when multiplied or otherwise operated on by itself.
+Idempotent pipeline = The ability for your data pipeline to produce the same results whether it’s running in production or in backfill.">
+
+	
+        <link href="http://localhost:1313/blog/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	
+
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="http://localhost:1313/blog/css/main.5cebd7d4fb2b97856af8d32a6def16164fcf7d844e98e236fcb3559655020373.css" />
+
+	
+	
+
+	
+	
+
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="http://localhost:1313/">Gabriel Study Blog</a>
+	</div>
+	<nav>
+		
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">(DataExpert.io) Bootcamp - Day 2 - Lecture</h1>
+			<div class="meta">Posted on Nov 17, 2024</div>
+		</div>
+		
+
+		
+
+		<section class="body">
+			<p>Today&rsquo;s lecture deals with <strong>Slowly Changing Dimensions</strong> and <strong>Idempotency</strong>.</p>
+<blockquote>
+<p><strong>Slowly changing dimensions</strong> = An attribute that drifts over time</p>
+</blockquote>
+<p><em>Example:</em> Your favorite food</p>
+<h2 id="idempotency">Idempotency</h2>
+<p>You need to model slowly dimensions the right way because they impact idempotency.</p>
+<blockquote>
+<p><strong>Idempotent</strong> = Denoting an element of a set which is unchanged in value when multiplied or otherwise operated on by itself.</p>
+</blockquote>
+<blockquote>
+<p><strong>Idempotent pipeline</strong> = The ability for your data pipeline to produce the same results whether it&rsquo;s running in production or in backfill.</p>
+</blockquote>
+<p>It&rsquo;s a very important property of pipelines in order to enforce data quality</p>
+<p>If you can build <strong>idempotent</strong> pipelines you are going to be a much better Data Engineer.</p>
+<p><strong>Your pipelines should produce the same result :</strong></p>
+<ul>
+<li>Regardless the day you run it</li>
+<li>Regardless of many times you run it</li>
+<li>Regardless of the hour that you run it</li>
+</ul>
+<blockquote>
+<p>Data Engineers mistakes a lot these three characteristics of a pipeline.</p>
+</blockquote>
+<p><strong>Why is it hard to troubleshoot a non-idempotent pipeline ?</strong> &raquo; It doesn&rsquo;t actually fails, it just produces incorrect data silently.</p>
+<blockquote>
+<p>Zach prefers to say &ldquo;non reproducible&rdquo; data whether &ldquo;incorrect&rdquo;</p>
+</blockquote>
+<p>If your data isn&rsquo;t idempotent downstream data will also be (there&rsquo;s propagation of the problem)</p>
+<h2 id="what-can-make-a-pipeline-not-idempotent-">What can make a pipeline not idempotent ?</h2>
+<p><strong>Using <code>INSERT INTO</code> without TRUNCATE</strong></p>
+<ul>
+<li>Creates duplication</li>
+<li>Your pipeline doesn&rsquo;t produces the same data regardless how many times it&rsquo;s run</li>
+<li><code>INSERT INTO</code> should never be used as a Data Engineer</li>
+<li><code>MERGE</code> and <code>INSERT OVERWRITE</code> are better ways to go
+<ul>
+<li><code>MERGE</code> avoids duplication</li>
+</ul>
+</li>
+</ul>
+<p><strong>Using <code>start_date &gt;</code> without a corresponding <code>end_date &lt;</code></strong></p>
+<ul>
+<li>While the time passes further new runs of the pipeline are going to add data from longer time periods.</li>
+<li>You need to use start and end dates to process only a &ldquo;window&rdquo;</li>
+<li>This can also cause out of memory exceptions when you backfill</li>
+</ul>
+<p><strong>Not using a full set of partitions sensors</strong></p>
+<ul>
+<li>Your pipeline might run with an incomplete set of inputs</li>
+<li>You have to check for the full sets of input needed by the pipeline</li>
+<li>Avoid to fire the pipeline to early in production</li>
+</ul>
+<p><strong>Not using <code>depends_on_past</code> (Airflow term) for cumulatives pipelines</strong></p>
+<ul>
+<li>Most pipeline can run in parallel</li>
+<li>Cumulatives pipelines have to run sequentially</li>
+</ul>
+<blockquote>
+<p>The production and back-fill behavior of a pipeline have to be the same.</p>
+</blockquote>
+<blockquote>
+<p><strong>SCD</strong> = Slowly Changing Dimensions</p>
+</blockquote>
+<p><strong>Relying on the &ldquo;latest&rdquo; partition of a not properly modeled SCD table</strong></p>
+<ul>
+<li>Cumulatives pipelines amplifies this bug</li>
+<li>The only exception for using &ldquo;latest&rdquo; partition is back-filling data</li>
+<li>The SCD table has to be properly modeled though</li>
+</ul>
+<p><strong>Relying on the &ldquo;latest&rdquo; partition in general</strong></p>
+<blockquote>
+<p>You can&rsquo;t do back-filling without idempotency</p>
+</blockquote>
+<blockquote>
+<p>Unit tests doesn&rsquo;t guarantees the pipeline idempotency.</p>
+</blockquote>
+<h2 id="should-you-model-as-slowly-changing-dimensions-">Should you model as Slowly Changing Dimensions ?</h2>
+<p>There is also a concept of <strong>rapidly changing dimensions</strong>.</p>
+<blockquote>
+<p>Example: The heart rate</p>
+</blockquote>
+<p><strong>The creator of Airflow hates SCDs :</strong></p>
+<ul>
+<li>He defends the idea of <em>functional data engineering</em>
+<ul>
+<li>The pipeline is a chain of pure functions</li>
+</ul>
+</li>
+<li>As the storage is cheaper he prefers storing each version of the data no matter duplication.
+<ul>
+<li>Daily dimensions values over SCDs</li>
+</ul>
+</li>
+</ul>
+<h3 id="three-different-ways-to-model-your-dimensions">Three different ways to model your dimensions</h3>
+<h4 id="latest-snapshot">Latest snapshot</h4>
+<p>You just store the current value.</p>
+<p><strong>Weakness :</strong> If you have SCD and you only hold-on to the latest value the pipeline is not idempotent.</p>
+<p>You are going to back-fill  values with the latest data version sometimes with a huge time gap.</p>
+<p>That&rsquo;s where daily snapshot is better for back-filling</p>
+<h4 id="daily--monthly--yearly-snapshot">Daily / Monthly / Yearly snapshot</h4>
+<h4 id="slowly-changing-dimensions">Slowly Changing Dimensions</h4>
+<p>A way to collapse daily snapshot based on whether or not the data changed day over day.</p>
+<blockquote>
+<p>Example : One row saying you have this age for this time frame (1 years) instead of 365 rows with the same age.</p>
+</blockquote>
+<p>The slower the dimension changes the better is the compression.</p>
+<blockquote>
+<p>Saving 7 rows (a week) with compression is less interesting than saving 365 rows (a year).</p>
+</blockquote>
+<p>Keep this in mind when choosing your modelling.</p>
+<h2 id="how-can-i-model-dimensions-that-change-">How can I model dimensions that change ?</h2>
+<p>There are three ways to model SCD :</p>
+<ol>
+<li>Singular snapshot</li>
+<li>Daily partitioned snapshots (Easy and intuitive way to go)</li>
+<li>SCD types 1, 2, 3 (three subways)</li>
+</ol>
+<blockquote>
+<p><strong>Warning :</strong> Never back-fill with only the latest snapshot</p>
+</blockquote>
+<h2 id="the-types-of-scd">The types of SCD</h2>
+<h3 id="type-0">Type 0</h3>
+<p>Not changing dimension</p>
+<h3 id="type-1">Type 1</h3>
+<ul>
+<li>You only care about the latest value</li>
+<li>This breaks your pipeline idempotency</li>
+<li>For OLTP it can be fine</li>
+</ul>
+<h3 id="type-2">Type 2</h3>
+<p>You care about what the value was in a certain time frame.</p>
+<blockquote>
+<p><code>start_date</code> and <code>end_date</code></p>
+</blockquote>
+<p>Current values usually have either an <code>end_date</code> that is <code>NULL</code> or far in the future</p>
+<p><strong>Benefits :</strong></p>
+<ul>
+<li>Only type of SCD that is purely idempotent.</li>
+<li>Full change history</li>
+</ul>
+<p><strong>Drawback :</strong></p>
+<ul>
+<li>There are multiple rows for the same dimension
+<ul>
+<li>You&rsquo;ll have to filter by date</li>
+</ul>
+</li>
+</ul>
+<h3 id="type-3">Type 3</h3>
+<p>You only care about &ldquo;original&rdquo; and &ldquo;current&rdquo; values</p>
+<p><strong>Benefits :</strong></p>
+<ul>
+<li>You only have 1 row per dimension</li>
+<li>No row filtering</li>
+</ul>
+<p><strong>Drawbacks :</strong></p>
+<ul>
+<li>You loose the history in between &ldquo;original&rdquo; and &ldquo;current&rdquo;.</li>
+<li>It may not store when the value changed unless you have a <code>current_change_date</code></li>
+<li>It is not idempotent</li>
+</ul>
+<blockquote>
+<p>There are others types of SCD models that are less used.</p>
+</blockquote>
+<h2 id="loading-type-2-scds">Loading Type 2 SCDs</h2>
+<p>Two ways to load a table with SCDs :</p>
+<ol>
+<li>Load the entire history in one query
+<ul>
+<li>Can be okay if the dataset is small.</li>
+</ul>
+</li>
+<li>Incrementally load the data after the previous SCD is generated
+<ul>
+<li>We want the production data to be incremental so we don&rsquo;t process the all history each time it changes.</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>Remember that all your pipelines don&rsquo;t have to be perfect</p>
+</blockquote>
+<h2 id="additional-resources">Additional resources</h2>
+<blockquote>
+<p><a href="https://airbyte.com/data-engineering-resources/idempotency-in-data-pipelines">https://airbyte.com/data-engineering-resources/idempotency-in-data-pipelines</a></p>
+</blockquote>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+		</article>
+</main>
+<footer>
+  <div style="display:flex"></div>
+  <div class="footer-info">
+    2024  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
+</div>
+    </body>
+</html>
