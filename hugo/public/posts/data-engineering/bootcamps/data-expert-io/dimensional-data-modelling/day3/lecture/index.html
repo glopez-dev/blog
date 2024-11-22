@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html><head lang="en"><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>(DataExpert.io) Bootcamp - Day 3 - Lecture - Gabriel Study Blog</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Today&rsquo;s lecture is about dimensional additivity and how to build a flexible data model ready for graph database consumption
+Index
+
+Additive VS non-additive dimensions
+The power of Enums
+When should you use flexible data types ?
+Graph data modeling
+
+Additive vs Non-additive dimensions
+What makes a dimension additive ?
+Additivity refers to whether numerical facts (measures) in a fact table can be meaningfully aggregated across different dimensions.
+If you take all the sub-totals and sum them up you should have the total" />
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content="http://localhost:1313/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day3/lecture/">
+  <meta property="og:site_name" content="Gabriel Study Blog">
+  <meta property="og:title" content="(DataExpert.io) Bootcamp - Day 3 - Lecture">
+  <meta property="og:description" content="Today’s lecture is about dimensional additivity and how to build a flexible data model ready for graph database consumption
+Index Additive VS non-additive dimensions The power of Enums When should you use flexible data types ? Graph data modeling Additive vs Non-additive dimensions What makes a dimension additive ? Additivity refers to whether numerical facts (measures) in a fact table can be meaningfully aggregated across different dimensions.
+If you take all the sub-totals and sum them up you should have the total">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-11-19T17:46:24+01:00">
+    <meta property="article:modified_time" content="2024-11-19T17:46:24+01:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="(DataExpert.io) Bootcamp - Day 3 - Lecture">
+  <meta name="twitter:description" content="Today’s lecture is about dimensional additivity and how to build a flexible data model ready for graph database consumption
+Index Additive VS non-additive dimensions The power of Enums When should you use flexible data types ? Graph data modeling Additive vs Non-additive dimensions What makes a dimension additive ? Additivity refers to whether numerical facts (measures) in a fact table can be meaningfully aggregated across different dimensions.
+If you take all the sub-totals and sum them up you should have the total">
+
+	
+        <link href="http://localhost:1313/blog/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	
+
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="http://localhost:1313/blog/css/main.5cebd7d4fb2b97856af8d32a6def16164fcf7d844e98e236fcb3559655020373.css" />
+
+	
+	
+
+	
+	
+
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="http://localhost:1313/">Gabriel Study Blog</a>
+	</div>
+	<nav>
+		
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">(DataExpert.io) Bootcamp - Day 3 - Lecture</h1>
+			<div class="meta">Posted on Nov 19, 2024</div>
+		</div>
+		
+
+		
+
+		<section class="body">
+			<p>Today&rsquo;s lecture is about dimensional additivity and how to build a flexible data model ready for graph database consumption</p>
+<h2 id="index">Index</h2>
+<ul>
+<li>Additive VS non-additive dimensions</li>
+<li>The power of Enums</li>
+<li>When should you use flexible data types ?</li>
+<li>Graph data modeling</li>
+</ul>
+<h2 id="additive-vs-non-additive-dimensions">Additive vs Non-additive dimensions</h2>
+<h3 id="what-makes-a-dimension-additive-">What makes a dimension additive ?</h3>
+<p>Additivity refers to whether numerical facts (measures) in a fact table can be meaningfully aggregated across different dimensions.</p>
+<p>If you take all the sub-totals and sum them up you should have the total</p>
+<p><em>Example :</em> The sum of the count of people of each age gives the total population</p>
+<p>An additive dimension is one that don&rsquo;t &ldquo;double count&rdquo;</p>
+<p><em>Example :</em> The total number of driver doesn&rsquo;t equals the sum of each car brand drivers because some people owns two cars</p>
+<blockquote>
+<p>You should ask yourself if a user can be two of these at the same time on a given day.</p>
+</blockquote>
+<h3 id="the-essential-nature-of-additivity">The essential nature of additivity</h3>
+<p>A dimension is additive over a specific time window, if and only if, the grain of that window can only be one value at a time.</p>
+<ul>
+<li>In a time window of one second, one driver can&rsquo;t drive two cars</li>
+<li>In a time window of one day, one driver can drive many cars</li>
+</ul>
+<h3 id="how-does-additivity-helps-">How does additivity helps ?</h3>
+<p>You don&rsquo;t need to use <code>COUNT(DISTINCT)</code> on preaggregated dimensions.</p>
+<blockquote>
+<p><strong>Note :</strong> Non-additive dimensions are usually only non-additive with respect to <code>COUNT</code> aggregations but not <code>SUM</code> aggregations.</p>
+</blockquote>
+<h2 id="the-power-of-enums">The power of Enums</h2>
+<h3 id="when-should-you-use-enums-">When should you use enums ?</h3>
+<p>Enums are great for low-to-medium cardinality</p>
+<p><em>Example :</em> countries (200) might be to much for an enum.</p>
+<p>If it&rsquo;s less than 50 it might be a good enum</p>
+<h3 id="why-should-you-use-enums-">Why should you use enums ?</h3>
+<h4 id="built-in-data-quality">Built in data quality</h4>
+<ul>
+<li>The Enum guarantees the set of values a field can take.</li>
+<li>This prevents invalid values at the database level</li>
+<li>You can&rsquo;t insert &lsquo;pending &rsquo; (with space) or &lsquo;PENDING&rsquo; (wrong case)</li>
+<li>More reliable than <code>CHECK</code> constraints on <code>VARCHAR</code> columns</li>
+</ul>
+<h4 id="built-in-static-fields">Built in static fields</h4>
+<ul>
+<li>The enum values are stored as internal constants in the database</li>
+<li>More storage efficient than VARCHAR</li>
+<li>PostgreSQL stores enum values as integers internally but presents them as strings to users</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- More efficient than storing the full string each time
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">FROM</span> orders <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> order_status;
+</span></span></code></pre></div><h4 id="built-in-documentation">Built in documentation</h4>
+<ul>
+<li>The enum definition serves as documentation in the database schema</li>
+<li>Developers can see all valid values by checking the enum type:</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e"># Postgres SQL command :</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">\d</span>T+ status
+</span></span></code></pre></div><h3 id="enumerations-and-subpartitions">Enumerations and subpartitions</h3>
+<p>Enumerations makes amazing subpartitions because :</p>
+<ul>
+<li>You have an exausthive list</li>
+<li>They chunk up the big data problem into manageable pieces</li>
+</ul>
+<p><em>Thrift</em> is a tool to manage schemas in your logging as well as you ETLs</p>
+<blockquote>
+<p><a href="https://en.wikipedia.org/wiki/Apache_Thrift">https://en.wikipedia.org/wiki/Apache_Thrift</a></p>
+</blockquote>
+<p>Zach created a framework named &ldquo;Little book of pipelines&rdquo;</p>
+<blockquote>
+<p><a href="https://github.com/EcZachly/little-book-of-pipelines">https://github.com/EcZachly/little-book-of-pipelines</a></p>
+</blockquote>
+<p>The enum pattern is useful whenever you have tons of sources mapping to a shared schema.</p>
+<h2 id="how-do-you-model-data-from-disparate-sources-into-a-shared-schema-">How do you model data from disparate sources into a shared schema ?</h2>
+<p>You don&rsquo;t want to bring all the columns from 40 tables into one table with 500 columns</p>
+<ul>
+<li>Most columns are going to be NULL all the time</li>
+<li>It&rsquo;s not really usable table</li>
+</ul>
+<p>You want to use a &ldquo;flexible schema&rdquo;</p>
+<ul>
+<li>Use a lot of map types</li>
+<li>Overlaps a lot with graph database
+<ul>
+<li>The enumerated list of things is similar to a &ldquo;Vertex type&rdquo;</li>
+</ul>
+</li>
+</ul>
+<h3 id="flexible-schemas">Flexible schemas</h3>
+<p>If you need to add more things you just add it to the map</p>
+<p>If new columns appears you can add them to the map</p>
+<blockquote>
+<p><strong>Limit :</strong> Maps in Spark can have up to 65,000 keys</p>
+</blockquote>
+<h4 id="benefits">Benefits</h4>
+<ul>
+<li>No <code>ALTER TABLE</code> commands</li>
+<li>You can manage a lot more columns</li>
+<li>You don&rsquo;t have a ton of <code>NULL</code> columns</li>
+<li>You can use an &ldquo;other_properties&rdquo;
+<ul>
+<li>Carry rarely used but needed column</li>
+<li>Allows you to ignore them during modelisation</li>
+</ul>
+</li>
+</ul>
+<h4 id="drawbacks">Drawbacks</h4>
+<ul>
+<li>Compression is terrible
+<ul>
+<li>Map is one of the worst compression of all data types</li>
+<li>The only thing worse is JSON</li>
+<li>The column headers becomes map keys so they are part of the data instead of the schema and duplicated in each row</li>
+</ul>
+</li>
+</ul>
+<h2 id="how-is-graph-modelling-different-">How is graph modelling different ?</h2>
+<p>Graph modelling is Relationship focused, not Entity focused.</p>
+<p>You can do a very poor job at modeling entities</p>
+<h3 id="zach-super-secret-sauce-for-graph-data-modelling-">Zach super secret sauce for Graph data modelling :</h3>
+<p>He always met the same schema when doing graph databases</p>
+<p>We don&rsquo;t care about columns</p>
+<p>Usually for an <strong>entity</strong> in a graph the model is :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>Identifier: STRING
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Type</span>: STRING
+</span></span><span style="display:flex;"><span>Properties: <span style="color:#66d9ef">MAP</span><span style="color:#f92672">&lt;</span>STRING, STRING<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>The <strong>relationships</strong> are modeled a little bit more in depth;</p>
+<p>Usually the model looks like :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>subject_identifier: STRING
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Example: player_name
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>subject_type: VERTEX_TYPE 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Example: player
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>object_identifier: STRING
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Example: team_name
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>object_type: VERTEX_TYPE 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Example: team
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>edge_type: EDGE_TYPE
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Example: &#34;PLAYS WITH&#34; , &#34;PLAYS AGAINST&#34; (an action)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>properties: <span style="color:#66d9ef">MAP</span><span style="color:#f92672">&lt;</span>STRING, STRING<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div>
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+		</article>
+</main>
+<footer>
+  <div style="display:flex"></div>
+  <div class="footer-info">
+    2024  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
+</div>
+    </body>
+</html>

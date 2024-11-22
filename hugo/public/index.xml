@@ -6,8 +6,15 @@
     <description>Recent content on Gabriel Study Blog</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 17 Nov 2024 19:21:32 +0100</lastBuildDate>
+    <lastBuildDate>Tue, 19 Nov 2024 17:46:24 +0100</lastBuildDate>
     <atom:link href="http://localhost:1313/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>(DataExpert.io) Bootcamp - Day 3 - Lecture</title>
+      <link>http://localhost:1313/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day3/lecture/</link>
+      <pubDate>Tue, 19 Nov 2024 17:46:24 +0100</pubDate>
+      <guid>http://localhost:1313/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day3/lecture/</guid>
+      <description>&lt;p&gt;Today&amp;rsquo;s lecture is about dimensional additivity and how to build a flexible data model ready for graph database consumption&lt;/p&gt;&#xA;&lt;h2 id=&#34;index&#34;&gt;Index&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Additive VS non-additive dimensions&lt;/li&gt;&#xA;&lt;li&gt;The power of Enums&lt;/li&gt;&#xA;&lt;li&gt;When should you use flexible data types ?&lt;/li&gt;&#xA;&lt;li&gt;Graph data modeling&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;additive-vs-non-additive-dimensions&#34;&gt;Additive vs Non-additive dimensions&lt;/h2&gt;&#xA;&lt;h3 id=&#34;what-makes-a-dimension-additive-&#34;&gt;What makes a dimension additive ?&lt;/h3&gt;&#xA;&lt;p&gt;Additivity refers to whether numerical facts (measures) in a fact table can be meaningfully aggregated across different dimensions.&lt;/p&gt;&#xA;&lt;p&gt;If you take all the sub-totals and sum them up you should have the total&lt;/p&gt;</description>
+    </item>
     <item>
       <title>(DataExpert.io) Bootcamp - Day 2 - Lecture</title>
       <link>http://localhost:1313/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day2/lecture/</link>
