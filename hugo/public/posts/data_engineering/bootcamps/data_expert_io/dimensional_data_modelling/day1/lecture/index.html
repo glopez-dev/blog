@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html><head lang="en"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>(DataExpert.io) Bootcamp - Day 1 - Lecture - Gabriel Study Blog</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="
+Today lecture with deal with complex data types and cumulation
+
+What is a dimension ?
+Dimensions are the attributes of an entity
+
+Some dimensions are identifiers
+Some dimensions are just attributes
+
+Dimensions come in two flavors (generally) :
+
+Slowly changing (time dependent)
+
+Makes things harder to model
+
+
+Fixed (doesn&rsquo;t change over time)
+
+Topics of the day (index)
+
+Knowing your data consumer
+OLTP vs OLAP modelling
+Cumulative table design
+The compactness vs usability tradeoff
+Temporal cardinality explosion
+Run-length encoding compression gotchas
+
+Knowing your consumer
+Who is going to consume the data ?" />
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content="http://localhost:1313/posts/data_engineering/bootcamps/data_expert_io/dimensional_data_modelling/day1/lecture/">
+  <meta property="og:site_name" content="Gabriel Study Blog">
+  <meta property="og:title" content="(DataExpert.io) Bootcamp - Day 1 - Lecture">
+  <meta property="og:description" content="Today lecture with deal with complex data types and cumulation
+What is a dimension ? Dimensions are the attributes of an entity
+Some dimensions are identifiers Some dimensions are just attributes Dimensions come in two flavors (generally) :
+Slowly changing (time dependent) Makes things harder to model Fixed (doesn’t change over time) Topics of the day (index) Knowing your data consumer OLTP vs OLAP modelling Cumulative table design The compactness vs usability tradeoff Temporal cardinality explosion Run-length encoding compression gotchas Knowing your consumer Who is going to consume the data ?">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-11-15T17:46:24+01:00">
+    <meta property="article:modified_time" content="2024-11-15T17:46:24+01:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="(DataExpert.io) Bootcamp - Day 1 - Lecture">
+  <meta name="twitter:description" content="Today lecture with deal with complex data types and cumulation
+What is a dimension ? Dimensions are the attributes of an entity
+Some dimensions are identifiers Some dimensions are just attributes Dimensions come in two flavors (generally) :
+Slowly changing (time dependent) Makes things harder to model Fixed (doesn’t change over time) Topics of the day (index) Knowing your data consumer OLTP vs OLAP modelling Cumulative table design The compactness vs usability tradeoff Temporal cardinality explosion Run-length encoding compression gotchas Knowing your consumer Who is going to consume the data ?">
+
+	
+        <link href="http://localhost:1313/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	
+
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="http://localhost:1313/css/main.5cebd7d4fb2b97856af8d32a6def16164fcf7d844e98e236fcb3559655020373.css" />
+
+	
+	
+
+	
+	
+
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="http://localhost:1313/">Gabriel Study Blog</a>
+	</div>
+	<nav>
+		
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">(DataExpert.io) Bootcamp - Day 1 - Lecture</h1>
+			<div class="meta">Posted on Nov 15, 2024</div>
+		</div>
+		
+
+		
+
+		<section class="body">
+			<blockquote>
+<p>Today lecture with deal with <strong>complex data types</strong> and <strong>cumulation</strong></p>
+</blockquote>
+<h3 id="what-is-a-dimension-">What is a dimension ?</h3>
+<p>Dimensions are the attributes of an entity</p>
+<ul>
+<li>Some dimensions are identifiers</li>
+<li>Some dimensions are just attributes</li>
+</ul>
+<p>Dimensions come in two flavors (generally) :</p>
+<ul>
+<li>Slowly changing (time dependent)
+<ul>
+<li>Makes things harder to model</li>
+</ul>
+</li>
+<li>Fixed (doesn&rsquo;t change over time)</li>
+</ul>
+<h2 id="topics-of-the-day-index">Topics of the day (index)</h2>
+<ul>
+<li>Knowing your data consumer</li>
+<li>OLTP vs OLAP modelling</li>
+<li>Cumulative table design</li>
+<li>The compactness vs usability tradeoff</li>
+<li>Temporal cardinality explosion</li>
+<li>Run-length encoding compression gotchas</li>
+</ul>
+<h2 id="knowing-your-consumer">Knowing your consumer</h2>
+<p>Who is going to consume the data ?</p>
+<p><strong>Data analyst / Data scientist :</strong></p>
+<ul>
+<li>Data should be easy to query</li>
+<li>Not many complex data types</li>
+<li>OLAP cube ?</li>
+</ul>
+<p><strong>Other data engineers :</strong></p>
+<ul>
+<li>Data should be compact</li>
+<li>Probably harder to query</li>
+<li>Nested types are okay</li>
+<li>Master dataset &raquo; consumed by others D.E</li>
+</ul>
+<p><strong>M.L models :</strong></p>
+<ul>
+<li>Most models use identifiers and primitive types columns</li>
+<li>&ldquo;Flat data&rdquo;</li>
+</ul>
+<p><strong>Customers :</strong></p>
+<ul>
+<li>Easy data interpretation</li>
+<li>Data visualization</li>
+</ul>
+<h2 id="oltp-vs-master-data-vs-olap">OLTP vs Master Data vs OLAP</h2>
+<p><strong>OLTP</strong> &raquo; On Line Transaction Processing</p>
+<ul>
+<li>Optimizes for low-latency, low volume queries</li>
+<li>Mostly outside of Data Engineering realm</li>
+<li>It is how Software Engineers model their data to make their online systems run quickly</li>
+<li>3NF, deduplication</li>
+</ul>
+<p><strong>OLAP</strong> &raquo; On Line Analytical Processing</p>
+<ul>
+<li>Optimizes for large volume, <code>GROUP BY</code> queries, minimize <code>JOIN</code>s</li>
+<li>Most common data modelling for D.E</li>
+<li>Big JOINs are slow</li>
+</ul>
+<p>OLAP usually looks at a big chunk of the dataset while OLTP looks at one record</p>
+<p><strong>Master Data</strong></p>
+<ul>
+<li>Middle ground between OLTP and OLAP</li>
+<li>Transactional layer &gt; Master Data layer &gt; Analytical layer</li>
+</ul>
+<p><strong>Mismatching the needs leads to less business value</strong></p>
+<ul>
+<li>Biggest D.E problems occurs when data is modelled for the wrong user
+Symptoms :</li>
+<li>Analytical modelling used as Transaction &raquo; Online app will be slow</li>
+<li>Transactional modelling for analytics &raquo; Lot of JOINs</li>
+<li>That&rsquo;s were master data middle role helps a lot</li>
+</ul>
+<p><strong>OLTP and OLAP is a continuum</strong></p>
+<p><img src="/images/oltp_olap_continuum.png" alt="oltp_olap_continuum"></p>
+<ul>
+<li>OLAP Cube
+<ul>
+<li>often reffered as &ldquo;slice and dice&rdquo;</li>
+<li>flattened data</li>
+</ul>
+</li>
+<li>Metrics
+<ul>
+<li>aggregates even more</li>
+<li>OLAP cube to one value</li>
+</ul>
+</li>
+</ul>
+<p><em>The continuum is like &ldquo;distillation&rdquo; you go from lots of productions database to one metric</em></p>
+<p>Understanding these patterns in data modelling will simplify the D.E life</p>
+<h2 id="cumulative-table-design">Cumulative Table Design</h2>
+<blockquote>
+<p><a href="https://github.com/DataExpert-io/cumulative-table-design">https://github.com/DataExpert-io/cumulative-table-design</a></p>
+</blockquote>
+<p>This design produces tables that can provide efficient analyses on arbitrarly large (up to thousands of days) timeframes.</p>
+<p>We initially build our <strong>daily</strong> metrics table that is at the grain of whatever our entity is. This data is derived from whatever event sources we have upstream.</p>
+<p>After we have our daily metrics, we <code>FULL OUTER JOIN</code> yesterday&rsquo;s <em>cumulative table</em> with today&rsquo;s daily data and build our metric arrays for each user. This allows us to bring the new history in without having to scan all of it. <strong>(a big performance boost)</strong></p>
+<p>These metric arrays allow us to easily answer queries about the history of all users using things like <code>ARRAY_SUM</code> to calculate whatever metric we want on whatever time frame the array allows.</p>
+<blockquote>
+<p>The longer the time frame of your analysis, the more critical this pattern becomes!!</p>
+</blockquote>
+<p><strong>It answers common problems when you build master data :</strong></p>
+<ul>
+<li>All users may not always showup</li>
+<li>You still want a complete history</li>
+<li>Holding on all the dimensions that ever existed (history)</li>
+</ul>
+<p><strong>Example :</strong></p>
+<ul>
+<li>Two Dataframes (yesterday and today)</li>
+<li><code>FULL OUTER JOIN</code> the Dataframes together</li>
+<li><code>COALESCE</code> values to keep everything around</li>
+<li>Hang onto all of history</li>
+</ul>
+<h3 id="use-cases">Use cases</h3>
+<ul>
+<li>Growth analytics</li>
+<li>State transition tracking
+<ul>
+<li>Growth accounting :
+<ul>
+<li>Active yesterday but not today (churned)</li>
+<li>Inactive yesterday but active today (resurected)</li>
+<li>Not existing yesterday but exists today (new)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="stengths">Stengths</h3>
+<ul>
+<li>Ability do to historical analysis
+<ul>
+<li>No need of GROUP BY</li>
+</ul>
+</li>
+<li>Scalable queries</li>
+</ul>
+<h3 id="drawbacks">Drawbacks</h3>
+<h4 id="sequential-backfilling">Sequential Backfilling</h4>
+<p><em>Backfilling</em> means populating historical data retroactively. In this design, you can&rsquo;t load historical data in any random order - you must process it sequentially (day by day)</p>
+<h4 id="handling-personal-identifiable-information-pii">Handling <em>Personal Identifiable Information</em> (PII)</h4>
+<p>If <strong>PII</strong> needs to be updated or deleted (e.g., for privacy regulations like GDPR):</p>
+<ul>
+<li>You can&rsquo;t just update the latest record</li>
+<li>You need to update/remove PII from the entire history in the arrays</li>
+<li>This could break the historical analysis capabilities</li>
+</ul>
+<h2 id="compactness-vs-usability-tradeoff">Compactness vs Usability tradeoff</h2>
+<p><strong>The most usable tables usually :</strong></p>
+<ul>
+<li>Have no complex data types</li>
+<li>Easily can be manipulated with <code>WHERE</code> and <code>GROUP BY</code></li>
+<li>More analytics focused</li>
+</ul>
+<p><strong>The most compact tables :</strong></p>
+<ul>
+<li>ID + blob of bytes</li>
+<li>Use compression codex</li>
+<li>Not human readable</li>
+<li>Ex : for transmission over Network</li>
+<li>More Software engineering focused</li>
+</ul>
+<p><strong>Middleground tables :</strong></p>
+<ul>
+<li>Use complex data types (ARRAY, MAP, STRUCTS)</li>
+<li>Querying is thickier</li>
+<li>Data is more compact</li>
+</ul>
+<p><strong>Where to use each type of table ?</strong>
+Most compact :</p>
+<ul>
+<li>Online systems</li>
+<li>When latency and volumes matters a lot</li>
+<li>Highly technical consumers</li>
+</ul>
+<p>Middle-ground :</p>
+<ul>
+<li>Upstream staging / master data</li>
+<li>Mostly D.E consumers</li>
+</ul>
+<p>Most usable :</p>
+<ul>
+<li>OLAP cubes</li>
+<li>Analytics consumers</li>
+</ul>
+<h3 id="struct-vs-array-vs-map">Struct vs Array vs Map</h3>
+<h4 id="struct">Struct</h4>
+<ul>
+<li>Almost like a table inside a table</li>
+<li>Keys are rigidly defined</li>
+<li>Compression is good</li>
+<li>Values can be any type</li>
+</ul>
+<h4 id="map">Map</h4>
+<ul>
+<li>Keys are loosely defined</li>
+<li>Compression is okay</li>
+<li>Values have to be the same type</li>
+</ul>
+<h4 id="array">Array</h4>
+<ul>
+<li>Ordered values</li>
+<li>Values are all the same type</li>
+<li>Values can be another complex type (Struct, Map)</li>
+</ul>
+<h2 id="temporal-cardinality-explosions-of-dimensions">Temporal Cardinality Explosions of Dimensions</h2>
+<blockquote>
+<p>One of the most impactful things Zach worked on.</p>
+</blockquote>
+<p>When you add a temporal aspect to your dimensions and the <em>cardinality</em> increases by at least one order of magnitude.</p>
+<p><strong>Example :</strong></p>
+<ul>
+<li>Airbnb has around 6 millions listings</li>
+<li>We want to know the nightly pricing and availability of each night for the next year
+<ul>
+<li>365 days * 6 million listings ~ 2 billions nights</li>
+</ul>
+</li>
+<li>Should this dataset be :
+<ul>
+<li>Listing-level with an array of 365 nights (6 million rows) ?</li>
+<li>Listing night level with 2 billion rows ?</li>
+</ul>
+</li>
+<li>If you do the sorting right Parquet will keep these two datasets about the same size</li>
+</ul>
+<h3 id="badness-of-denormalized-temporal-dimensions">Badness of denormalized temporal dimensions</h3>
+<ul>
+<li>If we choose the Listing night level Spark <code>JOIN</code> shuffling is gonna mess with the sorting</li>
+<li>Other run-length encoding is not going to compress that down as much</li>
+</ul>
+<h3 id="run-length-encoding-rle-compression">Run-Length Encoding (RLE) compression</h3>
+<p>Probably <strong>the most important compression technique in Big Data</strong> right now.</p>
+<blockquote>
+<p>It&rsquo;s why Parquet file has become so successful</p>
+</blockquote>
+<p>Shuffle can ruin <em>RLE</em> &raquo; <strong>Be careful!</strong></p>
+<blockquote>
+<p>Shuffle happens in distributed environments when you use <code>JOIN </code> and <code>GROUP BY</code>.</p>
+</blockquote>
+<p>Big thing about <em>RLE</em> is that duplicated data gets nullified</p>
+<p>After a join, Spark may mix up the ordering of the rows and ruin RLE compression.</p>
+<table>
+  <thead>
+      <tr>
+          <th>season</th>
+          <th>player_name</th>
+          <th>age</th>
+          <th>height</th>
+          <th>college</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1996</td>
+          <td>A.C. Green</td>
+          <td>33</td>
+          <td>6-9</td>
+          <td>Oregon State</td>
+      </tr>
+      <tr>
+          <td>1996</td>
+          <td>Michael Jordan</td>
+          <td>34</td>
+          <td>6-6</td>
+          <td>North Carolina</td>
+      </tr>
+      <tr>
+          <td>1997</td>
+          <td>A.C. Green</td>
+          <td>34</td>
+          <td>6-9</td>
+          <td>Oregon State</td>
+      </tr>
+      <tr>
+          <td>1997</td>
+          <td>Michael Jordan</td>
+          <td>35</td>
+          <td>6-6</td>
+          <td>North Carolina</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="two-ways-to-solve-the-problem-">Two ways to solve the problem :</h4>
+<ul>
+<li>One way to go is to re-sort the dataset after a join
+<ul>
+<li>Zach is not about that; you should sort your data once</li>
+</ul>
+</li>
+<li>Store everything in an array
+<ul>
+<li>A row with player name and seasons in an array</li>
+<li><code>JOIN</code> on <code>player name</code></li>
+<li>Explode the seasons array after the join</li>
+<li>It keeps the sorting because rows with the same player name are kept together after the explode</li>
+</ul>
+</li>
+</ul>
+<p>Leveraging this for master data can be powerful, especially for downstream data engineers</p>
+<ul>
+<li>You model data the right way so they can&rsquo;t make that mistake</li>
+</ul>
+<p><strong>Spark shuffles are a big thing to watch out for</strong></p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+		</article>
+</main>
+<footer>
+  <div style="display:flex"></div>
+  <div class="footer-info">
+    2024  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
+</div>
+    </body>
+</html>

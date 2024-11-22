@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Gabriel Study Blog</title>
-    <link>https://glopez.github.io/</link>
-    <description>Recent content on Gabriel Study Blog</description>
+    <title>Posts on Gabriel Study Blog</title>
+    <link>https://glopez.github.io/posts/</link>
+    <description>Recent content in Posts on Gabriel Study Blog</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Fri, 15 Nov 2024 17:46:24 +0100</lastBuildDate>
-    <atom:link href="https://glopez.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://glopez.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>(DataExpert.io) Bootcamp - Day 1 - Lecture</title>
       <link>https://glopez.github.io/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day1/lecture/</link>
