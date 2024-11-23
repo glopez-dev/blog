@@ -1,3 +1,5 @@
 baseURL="https://glopez.github.io/blog/"
 title="Gabriel Study Blog"
 theme="archie"
+
+enableEmoji = true

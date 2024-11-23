@@ -94,6 +94,115 @@
 				</section>
 				
 				<section class="list-item">
+					<h1 class="title"><a href="/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day1/lab/">(DataExpert.io) Bootcamp - Day 1 - Lab</a></h1>
+					<time>Nov 16, 2024</time>
+					<br><div class="description">
+	
+	<blockquote>
+<p><strong>Goal :</strong> Create a <em>cumulative table design</em></p>
+</blockquote>
+<h2 id="problem-overview">Problem overview</h2>
+<p>We have a table containing the stats for the NBA players, there&rsquo;s one record for each player&rsquo;s season.</p>
+<pre tabindex="0"><code>postgres=# \d player_seasons;
+</code></pre><p>Table <code>public.player_seasons</code></p>
+<table>
+  <thead>
+      <tr>
+          <th>Column</th>
+          <th>Type</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>player_name</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>age</td>
+          <td>integer</td>
+      </tr>
+      <tr>
+          <td>height</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>weight</td>
+          <td>integer</td>
+      </tr>
+      <tr>
+          <td>college</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>country</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>draft_year</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>draft_round</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>draft_number</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>gp</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>pts</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>reb</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>ast</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>netrtg</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>oreb_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>dreb_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>usg_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>ts_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>ast_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>season</td>
+          <td>integer</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Indexes:</strong>
+<code>&quot;player_seasons_pkey&quot; PRIMARY KEY, btree (player_name, season)</code></p>&hellip;
+	
+</div>
+					<a class="readmore" href="/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day1/lab/">Read more ⟶</a>
+				</section>
+				
+				<section class="list-item">
 					<h1 class="title"><a href="/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day1/lecture/">(DataExpert.io) Bootcamp - Day 1 - Lecture</a></h1>
 					<time>Nov 15, 2024</time>
 					<br><div class="description">

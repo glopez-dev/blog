@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html><head lang="en"><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>(DataExpert.io) Bootcamp - Day 1 - Lab - Gabriel Study Blog</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="
+Goal : Create a cumulative table design
+
+Problem overview
+We have a table containing the stats for the NBA players, there&rsquo;s one record for each player&rsquo;s season.
+postgres=# \d player_seasons;
+Table public.player_seasons
+
+  
+      
+          Column
+          Type
+      
+  
+  
+      
+          player_name
+          text
+      
+      
+          age
+          integer
+      
+      
+          height
+          text
+      
+      
+          weight
+          integer
+      
+      
+          college
+          text
+      
+      
+          country
+          text
+      
+      
+          draft_year
+          text
+      
+      
+          draft_round
+          text
+      
+      
+          draft_number
+          text
+      
+      
+          gp
+          real
+      
+      
+          pts
+          real
+      
+      
+          reb
+          real
+      
+      
+          ast
+          real
+      
+      
+          netrtg
+          real
+      
+      
+          oreb_pct
+          real
+      
+      
+          dreb_pct
+          real
+      
+      
+          usg_pct
+          real
+      
+      
+          ts_pct
+          real
+      
+      
+          ast_pct
+          real
+      
+      
+          season
+          integer
+      
+  
+
+Indexes:
+&quot;player_seasons_pkey&quot; PRIMARY KEY, btree (player_name, season)" />
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content="http://localhost:1313/blog/posts/data-engineering/bootcamps/data-expert-io/dimensional-data-modelling/day1/lab/">
+  <meta property="og:site_name" content="Gabriel Study Blog">
+  <meta property="og:title" content="(DataExpert.io) Bootcamp - Day 1 - Lab">
+  <meta property="og:description" content="Goal : Create a cumulative table design
+Problem overview We have a table containing the stats for the NBA players, there’s one record for each player’s season.
+postgres=# \d player_seasons; Table public.player_seasons
+Column Type player_name text age integer height text weight integer college text country text draft_year text draft_round text draft_number text gp real pts real reb real ast real netrtg real oreb_pct real dreb_pct real usg_pct real ts_pct real ast_pct real season integer Indexes: &#34;player_seasons_pkey&#34; PRIMARY KEY, btree (player_name, season)">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-11-16T17:52:23+01:00">
+    <meta property="article:modified_time" content="2024-11-16T17:52:23+01:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="(DataExpert.io) Bootcamp - Day 1 - Lab">
+  <meta name="twitter:description" content="Goal : Create a cumulative table design
+Problem overview We have a table containing the stats for the NBA players, there’s one record for each player’s season.
+postgres=# \d player_seasons; Table public.player_seasons
+Column Type player_name text age integer height text weight integer college text country text draft_year text draft_round text draft_number text gp real pts real reb real ast real netrtg real oreb_pct real dreb_pct real usg_pct real ts_pct real ast_pct real season integer Indexes: &#34;player_seasons_pkey&#34; PRIMARY KEY, btree (player_name, season)">
+
+	
+        <link href="http://localhost:1313/blog/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	
+
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="http://localhost:1313/blog/css/main.5cebd7d4fb2b97856af8d32a6def16164fcf7d844e98e236fcb3559655020373.css" />
+
+	
+	
+
+	
+	
+
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="http://localhost:1313/">Gabriel Study Blog</a>
+	</div>
+	<nav>
+		
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">(DataExpert.io) Bootcamp - Day 1 - Lab</h1>
+			<div class="meta">Posted on Nov 16, 2024</div>
+		</div>
+		
+
+		
+
+		<section class="body">
+			<blockquote>
+<p><strong>Goal :</strong> Create a <em>cumulative table design</em></p>
+</blockquote>
+<h2 id="problem-overview">Problem overview</h2>
+<p>We have a table containing the stats for the NBA players, there&rsquo;s one record for each player&rsquo;s season.</p>
+<pre tabindex="0"><code>postgres=# \d player_seasons;
+</code></pre><p>Table <code>public.player_seasons</code></p>
+<table>
+  <thead>
+      <tr>
+          <th>Column</th>
+          <th>Type</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>player_name</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>age</td>
+          <td>integer</td>
+      </tr>
+      <tr>
+          <td>height</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>weight</td>
+          <td>integer</td>
+      </tr>
+      <tr>
+          <td>college</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>country</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>draft_year</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>draft_round</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>draft_number</td>
+          <td>text</td>
+      </tr>
+      <tr>
+          <td>gp</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>pts</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>reb</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>ast</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>netrtg</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>oreb_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>dreb_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>usg_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>ts_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>ast_pct</td>
+          <td>real</td>
+      </tr>
+      <tr>
+          <td>season</td>
+          <td>integer</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Indexes:</strong>
+<code>&quot;player_seasons_pkey&quot; PRIMARY KEY, btree (player_name, season)</code></p>
+<p>We have a temporal data problem with the table where joining the table with another would cause shuffling of the players records (same player statics won&rsquo;t be following each other) making <strong>run-length encoding</strong> compression less efficient</p>
+<h2 id="run-length-encoding">Run-Length Encoding</h2>
+<blockquote>
+<p><strong>Run-Length Encoding</strong> is a simple data compression algorithm that encodes consecutive repeated data elements (runs) as a single value plus a count of its repetitions.</p>
+</blockquote>
+<p>Instead of storing the repeated data multiple times, it stores the data value and the number of times it appears consecutively.</p>
+<p>We are going to transform the table to have one row per player with a column of arrays of the player seasons.</p>
+<h2 id="cumulative-table-design">Cumulative table design</h2>
+<p>The cumulative design serves two distinct but complementary purposes:</p>
+<ol>
+<li>
+<p><strong>Join/GroupBy Optimization</strong>:</p>
+<ul>
+<li>By storing temporal data (seasons) together in arrays, we optimize for:
+<ul>
+<li>Fewer rows to join</li>
+<li>Less data shuffling during grouping</li>
+<li>Better data locality</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>RLE Compression</strong>: When we later explode/unnest the arrays, the data will naturally group temporal values together, making RLE more efficient.</p>
+</li>
+</ol>
+<h2 id="what-things-are-part-of-a-season-and-what-things-arent-">What things are part of a season and what things aren&rsquo;t ?</h2>
+<p>We want to store the temporal component in it&rsquo;s own data type.</p>
+<p>We create a <code>STRUCT</code> named <code>season_stats</code> with Postges :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TYPE</span> season_stats <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    season INTEGER,  
+</span></span><span style="display:flex;"><span>    gp INTEGER,  
+</span></span><span style="display:flex;"><span>    pts REAL,  
+</span></span><span style="display:flex;"><span>    reb REAL,  
+</span></span><span style="display:flex;"><span>    ast REAL  
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>We don&rsquo;t take all the season statistics in this struct as we won&rsquo;t need all of them.</p>
+<h2 id="creating-the-cumulative-table">Creating the cumulative table</h2>
+<p>Then we create the cumulative table schema using our new <code>STRUCT</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> players (  
+</span></span><span style="display:flex;"><span>    player_name TEXT,  
+</span></span><span style="display:flex;"><span>    height TEXT,  
+</span></span><span style="display:flex;"><span>    college TEXT,  
+</span></span><span style="display:flex;"><span>    country TEXT,  
+</span></span><span style="display:flex;"><span>	draft_year TEXT,
+</span></span><span style="display:flex;"><span>    draft_round TEXT,  
+</span></span><span style="display:flex;"><span>    season_stats season_stats[],  
+</span></span><span style="display:flex;"><span>    current_season INTEGER,  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span>(player_name, current_season)  
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>We want to figure out what is the first year in the table is :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">MIN</span>(season) <span style="color:#66d9ef">FROM</span> player_seasons;
+</span></span></code></pre></div><p>It is <code>1996</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> yesterday <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> players  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> current_seasons <span style="color:#f92672">=</span> <span style="color:#ae81ff">1995</span>  
+</span></span><span style="display:flex;"><span>),  
+</span></span><span style="display:flex;"><span>today <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> player_seasons  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> season <span style="color:#f92672">=</span> <span style="color:#ae81ff">1996</span>  
+</span></span><span style="display:flex;"><span>)  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> today t <span style="color:#66d9ef">FULL</span> <span style="color:#66d9ef">OUTER</span> <span style="color:#66d9ef">JOIN</span> yesterday y  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ON</span> t.player_name <span style="color:#f92672">=</span> y.player_name
+</span></span></code></pre></div><p>The request give us <code>&lt;null&gt;</code> values for the left side of the join <code>1995</code> (<code>yesterday</code>) as it doesn&rsquo;t exists.</p>
+<p>Now we want to <code>COALESCE()</code> the non temporal values.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> yesterday <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> players  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> current_seasons <span style="color:#f92672">=</span> <span style="color:#ae81ff">1995</span>  
+</span></span><span style="display:flex;"><span>),  
+</span></span><span style="display:flex;"><span>today <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> player_seasons  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> season <span style="color:#f92672">=</span> <span style="color:#ae81ff">1996</span>  
+</span></span><span style="display:flex;"><span>)  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> 
+</span></span><span style="display:flex;"><span>	COALESCE(t.player_name, y.player_name) <span style="color:#66d9ef">AS</span> player_name,
+</span></span><span style="display:flex;"><span>	COALESCE(t.height, y.height) <span style="color:#66d9ef">AS</span> height,
+</span></span><span style="display:flex;"><span>	COALESCE(t.college, y.college) <span style="color:#66d9ef">AS</span> college,
+</span></span><span style="display:flex;"><span>	COALESCE(t.country, y.country) <span style="color:#66d9ef">AS</span> country,
+</span></span><span style="display:flex;"><span>	COALESCE(t.draft_year, y.draft_year) <span style="color:#66d9ef">AS</span> draft_year,
+</span></span><span style="display:flex;"><span>	COALESCE(t.draft_round, y.draft_round) <span style="color:#66d9ef">AS</span> draft_round,
+</span></span><span style="display:flex;"><span>	COALESCE(t.draft_number, y.draft_number) <span style="color:#66d9ef">AS</span> draft_number,
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> today t <span style="color:#66d9ef">FULL</span> <span style="color:#66d9ef">OUTER</span> <span style="color:#66d9ef">JOIN</span> yesterday y  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ON</span> t.player_name <span style="color:#f92672">=</span> y.player_name
+</span></span></code></pre></div><p><strong>Purpose of COALESCE here</strong>:</p>
+<ul>
+<li>Handling data continuity between two time periods</li>
+<li>It ensures we keep the non-temporal data when a player exists in either period</li>
+</ul>
+<p><strong>What the query actually does</strong>:
+For each player:</p>
+<ul>
+<li>If player exists in &rsquo;today&rsquo; (1996): use today&rsquo;s data</li>
+<li>If player only exists in &lsquo;yesterday&rsquo; (1995): use yesterday&rsquo;s data</li>
+<li>If player exists in both: use today&rsquo;s data (through COALESCE taking first non-NULL)`</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> player_seasons;  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">DROP</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">IF</span> <span style="color:#66d9ef">EXISTS</span> players ;  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TYPE</span> scoring_class <span style="color:#66d9ef">AS</span> ENUM(<span style="color:#e6db74">&#39;star&#39;</span>, <span style="color:#e6db74">&#39;good&#39;</span>, <span style="color:#e6db74">&#39;average&#39;</span>, <span style="color:#e6db74">&#39;bad&#39;</span>);  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> players (  
+</span></span><span style="display:flex;"><span>    player_name TEXT,  
+</span></span><span style="display:flex;"><span>    height TEXT,  
+</span></span><span style="display:flex;"><span>    college TEXT,  
+</span></span><span style="display:flex;"><span>    country TEXT,  
+</span></span><span style="display:flex;"><span>    draft_year TEXT,  
+</span></span><span style="display:flex;"><span>    draft_round TEXT,  
+</span></span><span style="display:flex;"><span>    draft_number TEXT,  
+</span></span><span style="display:flex;"><span>    season_stats season_stats[],  
+</span></span><span style="display:flex;"><span>    scoring_class scoring_class,  
+</span></span><span style="display:flex;"><span>    years_since_last_season INTEGER,  
+</span></span><span style="display:flex;"><span>    current_season INTEGER,  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span>(player_name, current_season)  
+</span></span><span style="display:flex;"><span>);  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- This is the SEED query for cumulation because year 1995 is going to be &lt;null&gt;,  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- the FULL OUTER JOIN is just taking everything from today as yesterday doesn&#39;t exist.  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> players  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> yesterday <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> players  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> current_season  <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span>  
+</span></span><span style="display:flex;"><span>),  
+</span></span><span style="display:flex;"><span>today <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> player_seasons  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> season <span style="color:#f92672">=</span> <span style="color:#ae81ff">2001</span>  
+</span></span><span style="display:flex;"><span>)  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>  
+</span></span><span style="display:flex;"><span>    COALESCE(t.player_name, y.player_name) <span style="color:#66d9ef">AS</span> player_name,  
+</span></span><span style="display:flex;"><span>    COALESCE(t.height, y.height) <span style="color:#66d9ef">AS</span> height,  
+</span></span><span style="display:flex;"><span>    COALESCE(t.college, y.college) <span style="color:#66d9ef">AS</span> college,  
+</span></span><span style="display:flex;"><span>    COALESCE(t.country, y.country) <span style="color:#66d9ef">AS</span> country,  
+</span></span><span style="display:flex;"><span>    COALESCE(t.draft_year, y.draft_year) <span style="color:#66d9ef">AS</span> draft_year,  
+</span></span><span style="display:flex;"><span>    COALESCE(t.draft_round, y.draft_round) <span style="color:#66d9ef">AS</span> draft_round,  
+</span></span><span style="display:flex;"><span>    COALESCE(t.draft_number, y.draft_number) <span style="color:#66d9ef">AS</span> draft_number,  
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- If yesterday is null we create the initial array  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">CASE</span> <span style="color:#66d9ef">WHEN</span> y.season_stats <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NULL</span> <span style="color:#66d9ef">THEN</span>  
+</span></span><span style="display:flex;"><span>        ARRAY[<span style="color:#66d9ef">ROW</span>(  
+</span></span><span style="display:flex;"><span>            t.season,  
+</span></span><span style="display:flex;"><span>            t.gp,  
+</span></span><span style="display:flex;"><span>            t.pts,  
+</span></span><span style="display:flex;"><span>            t.reb,  
+</span></span><span style="display:flex;"><span>            t.ast  
+</span></span><span style="display:flex;"><span>        )::season_stats]  
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- If today is not null we create the new value by concatenating the array of previous values  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">-- with today&#39;s ones.    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">-- We don&#39;t want to keep adding values to the season_stats array if the player is retired 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">WHEN</span> t.season <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> <span style="color:#66d9ef">THEN</span>  
+</span></span><span style="display:flex;"><span>        y.season_stats <span style="color:#f92672">||</span> ARRAY[<span style="color:#66d9ef">ROW</span>(  
+</span></span><span style="display:flex;"><span>            t.season,  
+</span></span><span style="display:flex;"><span>            t.gp,  
+</span></span><span style="display:flex;"><span>            t.pts,  
+</span></span><span style="display:flex;"><span>            t.reb,  
+</span></span><span style="display:flex;"><span>            t.ast  
+</span></span><span style="display:flex;"><span>        )::season_stats]  
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- Otherwise we carry the history forward without modifying it.  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">ELSE</span> y.season_stats  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">END</span> <span style="color:#66d9ef">AS</span> season_stats,  
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- Determine the scoring class of the player for current season  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">CASE</span>  
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">WHEN</span> t.season <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> <span style="color:#66d9ef">THEN</span>  
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">CASE</span> <span style="color:#66d9ef">WHEN</span> t.pts <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">20</span> <span style="color:#66d9ef">THEN</span> <span style="color:#e6db74">&#39;star&#39;</span>  
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">WHEN</span> t.pts <span style="color:#f92672">&gt;</span>  <span style="color:#ae81ff">15</span> <span style="color:#66d9ef">THEN</span> <span style="color:#e6db74">&#39;good&#39;</span>  
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">WHEN</span> t.pts <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">10</span> <span style="color:#66d9ef">THEN</span> <span style="color:#e6db74">&#39;average&#39;</span>  
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">ELSE</span> <span style="color:#e6db74">&#39;bad&#39;</span>  
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">END</span>::scoring_class  
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ELSE</span> y.scoring_class  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">END</span> <span style="color:#66d9ef">as</span> scoring_class,  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">CASE</span> <span style="color:#66d9ef">WHEN</span> t.season <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> <span style="color:#66d9ef">THEN</span> <span style="color:#ae81ff">0</span>  
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ELSE</span> y.years_since_last_season <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">END</span> <span style="color:#66d9ef">as</span> years_since_last_season,  
+</span></span><span style="display:flex;"><span>    COALESCE(t.season, y.current_season <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#66d9ef">as</span> current_season  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> today t <span style="color:#66d9ef">FULL</span> <span style="color:#66d9ef">OUTER</span> <span style="color:#66d9ef">JOIN</span> yesterday y  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ON</span> t.player_name <span style="color:#f92672">=</span> y.player_name;  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- No GROUP BY = very fast, everything happens in the map step it can be parrallelized
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>  
+</span></span><span style="display:flex;"><span>    player_name,  
+</span></span><span style="display:flex;"><span>    (season_stats[<span style="color:#66d9ef">CARDINALITY</span>(season_stats)]::season_stats).pts <span style="color:#f92672">/</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">CASE</span> <span style="color:#66d9ef">WHEN</span> (season_stats[<span style="color:#ae81ff">1</span>]::season_stats).pts <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">THEN</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">ELSE</span> ((season_stats[<span style="color:#ae81ff">1</span>]::season_stats).pts) <span style="color:#66d9ef">END</span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> players  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> current_season <span style="color:#f92672">=</span> <span style="color:#ae81ff">2001</span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">AND</span> scoring_class <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;star&#39;</span>;  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Going back the original table  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">WITH</span> unnested <span style="color:#66d9ef">AS</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> player_name,  
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">UNNEST</span>(season_stats) <span style="color:#66d9ef">AS</span> season_stats  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> players  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> current_season <span style="color:#f92672">=</span> <span style="color:#ae81ff">2001</span>  
+</span></span><span style="display:flex;"><span>)  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> player_name,  
+</span></span><span style="display:flex;"><span>       (season_stats::season_stats).<span style="color:#f92672">*</span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> unnested;  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Here we keep player stats (temporal attributes) sorted through the JOIN
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- We can apply RLE compression efficiently
+</span></span></span></code></pre></div>
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+		</article>
+</main>
+<footer>
+  <div style="display:flex"></div>
+  <div class="footer-info">
+    2024  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
+</div>
+    </body>
+</html>
